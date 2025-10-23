@@ -62,10 +62,10 @@ graph TD
     
     LSS --> VDB
     
-    style PS fill:#90EE90
-    style IS fill:#FFB6C1
-    style LSS fill:#87CEEB
-    style VDB fill:#DDA0DD
+    style PS fill:#2E7D32
+    style IS fill:#E91E63
+    style LSS fill:#1976D2
+    style VDB fill:#7B1FA2
 ```
 
 **Component Details:**
