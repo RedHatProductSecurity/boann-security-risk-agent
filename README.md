@@ -80,7 +80,7 @@ graph TD
 
 ## Quickstart
 
-1. Copy env.example to .env and set environment variables (See Environment Variables Reference below)
+1. Copy env.example to .env and set environment variables (See the "Environment Variables Reference" below)
 2. Run
 ```bash
 $ uv run --env-file .env scripts/start_boann.py
@@ -321,22 +321,9 @@ uv run scripts/ingest_documents.py --verbose
 
 ### RAG Configuration
 
-The ingestion system can be configured through environment variables:
+The ingestion and RAG system can be configured through environment variables.
 
-- `MAX_DOCUMENT_SIZE`: Maximum size of a document that can be processed (default: 104857600 = 100MB)
-- `CHUNK_SIZE`: (to be implemented), target size for text chunks (default: `1000` characters)
-- `CHUNK_OVERLAP`: (to be implemented), overlap between chunks (default: `200` characters)
-
-TBD more
-
-## Setup on Kubernetes (recommended)
-
-To be updated
-
-
-## MCP integration
-
-To be updated
+See the "Environment Variables Reference" section above. 
 
 
 ## Security
@@ -368,4 +355,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contributing
 
-To be updated
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
