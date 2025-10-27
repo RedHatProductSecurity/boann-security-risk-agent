@@ -2,17 +2,20 @@
 
 ## Overview
 
-This project is Boann Security Risk Agent. It enables OCSF aware question answering and aggregate security risk report draft generation.
+Boann Security Risk Agent enables OCSF aware question answering and aggregate security risk report draft generation.
 
 ### What is Boann?
 
 Boann is a single pane of glass platform to aggregate various types of security findings into a central place and provide actionable insights and aggregate security risk report drafts.
 
-See also boann-ocsf-security-data-platform.
+See also [boann-ocsf-security-data-platform](https://github.com/RedHatProductSecurity/boann-ocsf-security-data-platform/)
 
 ## Status Note
 
 This project is under heavy development. New features, improvements, and bug fixes are being continuously delivered. Please do not hesitate to file issues.
+
+[OCSF (Open Cybersecurity Schema Framework)](https://schema.ocsf.io/) context will be integrated soon.
+
 
 ## Security Architecture
 
