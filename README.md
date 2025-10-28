@@ -166,8 +166,15 @@ If you prefer to start servers manually (e.g. for development purpose):
 **Start LlamaStack server:**
 ```bash
 # The following will run LlamaStack server on port $LLAMA_STACK_PORT or 8321
-uv run --env-file .env llama stack run ./your-config.yaml
+uv run --env-file .env llama stack run ./examples/config/run-starter-remote-minimal.yaml
 ```
+
+To use Pgvector as a vector database
+```bash
+# The following will run LlamaStack server on port $LLAMA_STACK_PORT or 8321
+uv run --env-file .env llama stack run ./examples/config/run-starter-remote-pgvector.yaml
+```
+
 
 **Start Boann servers:**
 

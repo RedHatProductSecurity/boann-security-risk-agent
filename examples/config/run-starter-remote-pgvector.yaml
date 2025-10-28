@@ -1,0 +1,95 @@
+# This config file is used to run LlamsStack with remote Gemini/OpenAI models only.
+# For more info on the config file, see: https://github.com/llamastack/llama-stack
+
+version: 2
+image_name: starter
+apis:
+  - inference
+  - agents
+  - tool_runtime
+  - safety
+  - vector_io
+  - files
+providers:
+  inference:
+  - provider_id: gemini
+    provider_type: remote::gemini
+    config:
+      api_key: ${env.GEMINI_API_KEY:=set-your-gemini-api-key}
+  - provider_id: openai
+    provider_type: remote::openai
+    config:
+      api_key: ${env.OPENAI_API_KEY:=set-your-openai-api-key}
+      base_url: ${env.OPENAI_BASE_URL:=https://api.openai.com/v1}
+  files:
+  - provider_id: meta-reference-files
+    provider_type: inline::localfs
+    config:
+      storage_dir: ${env.FILES_STORAGE_DIR:=~/.llama/distributions/starter/files}
+      metadata_store:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/files_metadata.db
+  vector_io:
+  - provider_id: faiss
+    provider_type: inline::faiss
+    config:
+      kvstore:
+        type: sqlite
+        namespace: null
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/faiss_store.db
+  - provider_id: pgvector
+    provider_type: remote::pgvector
+    config:
+      host: ${env.PGVECTOR_HOST:=localhost}
+      port: ${env.PGVECTOR_PORT:=5432}
+      db: ${env.PGVECTOR_DB:=}
+      user: ${env.PGVECTOR_USER:=}
+      password: ${env.PGVECTOR_PASSWORD:=}
+      persistence:
+        backend: kv_default
+        namespace: pgvector_registry
+  safety:
+  - provider_id: llama-guard
+    provider_type: inline::llama-guard
+    config:
+      excluded_categories: []
+  agents:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config:
+      persistence_store:
+        type: sqlite
+        namespace: null
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/agents_store.db
+      responses_store:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/responses_store.db
+  tool_runtime:
+  - provider_id: rag-runtime
+    provider_type: inline::rag-runtime
+    config: {}
+  - provider_id: model-context-protocol
+    provider_type: remote::model-context-protocol
+    config: {}
+models:
+- metadata: {}
+  model_id: gemini/gemini-2.5-flash
+  provider_id: gemini
+  provider_model_id: gemini/gemini-2.5-flash
+  model_type: llm
+- metadata:
+    embedding_dimension: 768    # 768 is for speed. other common options: 1536 or 3072
+  model_id: gemini/text-embedding-004
+  provider_id: gemini
+  provider_model_id: gemini/text-embedding-004
+  model_type: embedding
+shields: []
+tool_groups:
+- toolgroup_id: builtin::rag
+  provider_id: rag-runtime
+#- toolgroup_id: mcp::boann
+#  provider_id: model-context-protocol
+#  mcp_endpoint:
+#    uri: http://localhost:5100/mcp/sse
+server:
+  port: 8321
