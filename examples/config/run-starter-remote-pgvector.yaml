@@ -1,4 +1,11 @@
-# This config file is used to run LlamsStack with remote Gemini/OpenAI models only.
+# This config file is used to run LlamsStack with remote Gemini/OpenAI models only, with the 'pgvector' vector database provider.
+# Make sure that a PostgreSQL DB is set up and running with the pgvector extension enabled. Also set the following env vars in .env, e.g.:
+# PGVECTOR_HOST=localhost
+# PGVECTOR_PORT=5432
+# PGVECTOR_DB=boann
+# PGVECTOR_USER=postgres_user
+# PGVECTOR_PASSWORD=postgres_secure_password
+#
 # For more info on the config file, see: https://github.com/llamastack/llama-stack
 
 version: 2
@@ -30,13 +37,6 @@ providers:
         type: sqlite
         db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/files_metadata.db
   vector_io:
-  - provider_id: faiss
-    provider_type: inline::faiss
-    config:
-      kvstore:
-        type: sqlite
-        namespace: null
-        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/faiss_store.db
   - provider_id: pgvector
     provider_type: remote::pgvector
     config:
@@ -48,6 +48,14 @@ providers:
       persistence:
         backend: kv_default
         namespace: pgvector_registry
+  # faiss provider here could be removed but remains as a fallback
+  - provider_id: faiss
+    provider_type: inline::faiss
+    config:
+      kvstore:
+        type: sqlite
+        namespace: null
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/starter}/faiss_store.db
   safety:
   - provider_id: llama-guard
     provider_type: inline::llama-guard

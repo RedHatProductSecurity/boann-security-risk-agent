@@ -1,4 +1,4 @@
-# This config file is used to run LlamsStack with remote Gemini/OpenAI models only.
+# This config file is used to run LlamsStack with remote Gemini/OpenAI models only with the 'faiss' vector database provider.
 # For more info on the config file, see: https://github.com/llamastack/llama-stack
 
 version: 2
