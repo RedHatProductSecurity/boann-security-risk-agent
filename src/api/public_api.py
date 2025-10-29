@@ -255,15 +255,9 @@ def get_public_router():
 
             # Prepare query parameters based on vector provider
             query_params = {}
-            if vector_provider and "pgvector" in vector_provider.lower():
+            if vector_provider:
                 query_params = {
                     "max_chunks": os.getenv("MAX_CHUNKS", 10),
-                    "score_threshold": os.getenv("SCORE_THRESHOLDS", 0.7),
-                }
-
-            if vector_provider and "faiss" in vector_provider.lower():
-                query_params = {
-                    "max_chunks": 1,
                     "score_threshold": os.getenv("SCORE_THRESHOLDS", 0.7),
                 }
 
