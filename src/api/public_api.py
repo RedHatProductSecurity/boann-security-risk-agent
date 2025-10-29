@@ -262,7 +262,6 @@ def get_public_router():
                 }
 
             if vector_provider and "faiss" in vector_provider.lower():
-                print("jechoi: FAISS")
                 query_params = {
                     "max_chunks": 1,
                     "score_threshold": os.getenv("SCORE_THRESHOLDS", 0.7),
