@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional
 import httpx
 import asyncio
+from dotenv import load_dotenv
 
 
 class BoannClient:
@@ -181,19 +182,22 @@ def load_config(
     parser=None,
 ):
     """Load configuration from CLI arguments or environment variables"""
-    # Priority: CLI argument > environment variable > default
+    # Load environment variables from .env file if it exists
+    load_dotenv()
+
+    # Priority: CLI argument > environment variable > .env file > default
     api_key = api_key_arg or os.getenv("BOANN_API_KEY")
     base_url = base_url_arg or os.getenv("BOANN_API_URL") or "http://localhost:8000"
 
     if not api_key:
         if parser:
             parser.error(
-                "API key must be provided via --api-key argument or BOANN_API_KEY environment variable"
+                "API key must be provided via --api-key argument, BOANN_API_KEY environment variable, or .env file"
             )
         else:
             print("❌ Error: API key must be provided", file=sys.stderr)
             print(
-                "   Use --api-key argument or set BOANN_API_KEY environment variable",
+                "   Use --api-key argument, set BOANN_API_KEY environment variable, or add to .env file",
                 file=sys.stderr,
             )
             sys.exit(1)
@@ -228,7 +232,10 @@ async def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Authentication:
-  You can set either --api-key or BOANN_API_KEY environment variable for authentication.
+  You can authenticate using (in priority order):
+    1. --api-key command line argument
+    2. BOANN_API_KEY environment variable
+    3. BOANN_API_KEY in .env file (automatically loaded from project root)
 
 Examples:
   # Stream a query (default)
@@ -258,7 +265,7 @@ Examples:
   # Use custom CA certificate
   boann --cacert "/path/to/ca.pem" -u "https://your.boann-api.url" health
   
-Environment Variables:
+Environment Variables (.env file or shell):
   BOANN_API_KEY     API key for authentication (fallback if --api-key not provided)
   BOANN_API_URL     Base URL for the API (fallback if -u not provided, default: http://localhost:8000)
         """,
@@ -267,7 +274,7 @@ Environment Variables:
     # Global options
     parser.add_argument(
         "--api-key",
-        help="API key for authentication (overrides BOANN_API_KEY environment variable)",
+        help="API key for authentication (overrides BOANN_API_KEY environment variable and .env file)",
     )
     parser.add_argument(
         "-u",
