@@ -222,6 +222,87 @@ To ensure the setup has been completed, test the public service:
 curl http://localhost:8000/health
 ```
 
+
+### Boann CLI
+
+Boann provides a command-line interface (`boann`) for interacting with the API, making it easy to query the system and generate security reports directly from your terminal.
+
+**Installation:**
+
+The CLI is automatically available when you install the project with `uv`. After installation, activate the virtual environment to use the `boann` command directly:
+
+```bash
+# Install dependencies (if not already done)
+uv sync
+
+# Activate virtual environment
+source .venv/bin/activate
+
+# Now you can use boann directly
+boann --help
+```
+
+**Basic Commands:**
+
+- `boann query <text>` - Send a query to the API (streaming by default)
+- `boann report <product>` - Generate a security posture report for a product
+- `boann health` - Check API health status
+
+**Options:**
+
+- `--show-source` - Display RAG metadata including source documents and relevance scores (hidden by default for simplicity)
+- `--no-stream` - Disable streaming and get complete response at once
+- `-k, --insecure` - Disable SSL certificate verification
+- `--cacert <path>` - Use custom CA certificate for SSL verification
+
+**Examples:**
+
+```bash
+# Activate virtual environment
+source .venv/bin/activate
+
+# Set your API key (or use --api-key flag)
+export BOANN_API_KEY="your-api-key"
+export BOANN_API_URL="http://localhost:8000"
+
+# Query the system (streaming)
+boann query "What are the top three security risks of Product X?"
+
+# Generate a security posture report
+boann report "Product X 4.15"
+
+# Show source documents and relevance scores
+boann query "What are the security risks?" --show-source
+
+# Non-streaming query
+boann query "<query text>" --no-stream
+
+# Non-streaming report with source information
+boann report "Product X 4.15" --no-stream --show-source
+
+# Check API health
+boann health
+
+# Use with custom URL
+boann -u "https://your.boann-api.url" health
+
+# Disable SSL verification (development only)
+boann -k -u "https://your.boann-api.url" health
+
+# Use custom CA certificate
+boann --cacert "/path/to/ca.pem" -u "https://your.boann-api.url" health
+```
+
+**Authentication:**
+
+The CLI supports authentication via:
+- `--api-key` flag (highest priority)
+- `BOANN_API_KEY` environment variable (recommended)
+
+
+
+
+
 ### Query the API (Public Service)
 - Standard RAG query:
   ```bash

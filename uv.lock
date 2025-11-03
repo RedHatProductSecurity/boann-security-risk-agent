@@ -2808,10 +2808,11 @@ wheels = [
 [[package]]
 name = "wip-boann-cleanup"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "faiss-cpu" },
     { name = "greenlet" },
+    { name = "httpx" },
     { name = "litellm" },
     { name = "llama-stack" },
     { name = "llama-stack-client" },
@@ -2837,6 +2838,7 @@ local-ml = [
 requires-dist = [
     { name = "faiss-cpu", specifier = ">=1.12.0" },
     { name = "greenlet", specifier = "==3.2.3" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "litellm", specifier = "==1.74.4" },
     { name = "llama-stack", specifier = "==0.2.14" },
     { name = "llama-stack-client", specifier = "==0.2.14" },
