@@ -141,23 +141,19 @@ def get_public_router():
                         and hasattr(chunk.event.payload.delta, "text")
                     ):
                         content = chunk.event.payload.delta.text
+                        # Send content if we found any
+                        if content:
+                            json_data = {"type": "token", "content": content}
+                            yield f"data: {json.dumps(json_data)}\n\n"
 
-                    # Check for turn complete message
+                    # Check for turn complete event (don't resend content - already streamed)
                     elif (
                         hasattr(chunk, "event")
                         and hasattr(chunk.event, "payload")
                         and hasattr(chunk.event.payload, "turn")
                     ):
-                        turn = chunk.event.payload.turn
-                        if hasattr(turn, "output_message") and hasattr(
-                            turn.output_message, "content"
-                        ):
-                            content = turn.output_message.content
-
-                    # Send content if we found any
-                    if content:
-                        json_data = {"type": "token", "content": content}
-                        yield f"data: {json.dumps(json_data)}\n\n"
+                        # Turn complete - streaming is done, don't resend the complete message
+                        logger.debug("Turn complete event received")
 
             elif hasattr(agent_output, "__iter__"):
                 # Process regular generator
@@ -172,23 +168,19 @@ def get_public_router():
                         and hasattr(chunk.event.payload.delta, "text")
                     ):
                         content = chunk.event.payload.delta.text
+                        # Send content if we found any
+                        if content:
+                            json_data = {"type": "token", "content": content}
+                            yield f"data: {json.dumps(json_data)}\n\n"
 
-                    # Check for turn complete message
+                    # Check for turn complete event (don't resend content - already streamed)
                     elif (
                         hasattr(chunk, "event")
                         and hasattr(chunk.event, "payload")
                         and hasattr(chunk.event.payload, "turn")
                     ):
-                        turn = chunk.event.payload.turn
-                        if hasattr(turn, "output_message") and hasattr(
-                            turn.output_message, "content"
-                        ):
-                            content = turn.output_message.content
-
-                    # Send content if we found any
-                    if content:
-                        json_data = {"type": "token", "content": content}
-                        yield f"data: {json.dumps(json_data)}\n\n"
+                        # Turn complete - streaming is done, don't resend the complete message
+                        logger.debug("Turn complete event received")
 
                     # Add a small async sleep to allow other coroutines to run
                     await asyncio.sleep(0.001)
