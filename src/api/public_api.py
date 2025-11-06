@@ -10,7 +10,7 @@ import json
 import uuid
 
 from llama_stack_client import LlamaStackClient
-from llama_stack_client import Agent, AgentEventLogger
+from llama_stack_client import Agent
 
 # Import system prompt from config module
 from src.config import SYSTEM_PROMPT
@@ -354,20 +354,15 @@ def get_public_router():
         else:
             logger.debug("non streaming")
             try:
-                # Get the final response content
-                response_content = ""
-                for event in AgentEventLogger().log(output):
-                    if event is not None and hasattr(event, "content"):
-                        response_content += event.content
+                # For non-streaming, output is a Turn object from LlamaStack
+                response_content = None
+                if hasattr(output, "output_message") and hasattr(
+                    output.output_message, "content"
+                ):
+                    response_content = output.output_message.content
 
                 if not response_content:
-                    # Fallback to output_message if available
-                    if hasattr(output, "output_message") and hasattr(
-                        output.output_message, "content"
-                    ):
-                        response_content = output.output_message.content
-                    else:
-                        response_content = "No response generated."
+                    response_content = "No response generated from the model."
 
                 return {
                     "content": response_content,
