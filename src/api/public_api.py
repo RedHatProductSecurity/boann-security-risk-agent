@@ -10,7 +10,7 @@ import json
 import uuid
 
 from llama_stack_client import LlamaStackClient
-from llama_stack_client import Agent, AgentEventLogger
+from llama_stack_client import Agent
 
 # Import system prompt from config module
 from src.config import SYSTEM_PROMPT
@@ -141,23 +141,19 @@ def get_public_router():
                         and hasattr(chunk.event.payload.delta, "text")
                     ):
                         content = chunk.event.payload.delta.text
+                        # Send content if we found any
+                        if content:
+                            json_data = {"type": "token", "content": content}
+                            yield f"data: {json.dumps(json_data)}\n\n"
 
-                    # Check for turn complete message
+                    # Check for turn complete event (don't resend content - already streamed)
                     elif (
                         hasattr(chunk, "event")
                         and hasattr(chunk.event, "payload")
                         and hasattr(chunk.event.payload, "turn")
                     ):
-                        turn = chunk.event.payload.turn
-                        if hasattr(turn, "output_message") and hasattr(
-                            turn.output_message, "content"
-                        ):
-                            content = turn.output_message.content
-
-                    # Send content if we found any
-                    if content:
-                        json_data = {"type": "token", "content": content}
-                        yield f"data: {json.dumps(json_data)}\n\n"
+                        # Turn complete - streaming is done, don't resend the complete message
+                        logger.debug("Turn complete event received")
 
             elif hasattr(agent_output, "__iter__"):
                 # Process regular generator
@@ -172,23 +168,19 @@ def get_public_router():
                         and hasattr(chunk.event.payload.delta, "text")
                     ):
                         content = chunk.event.payload.delta.text
+                        # Send content if we found any
+                        if content:
+                            json_data = {"type": "token", "content": content}
+                            yield f"data: {json.dumps(json_data)}\n\n"
 
-                    # Check for turn complete message
+                    # Check for turn complete event (don't resend content - already streamed)
                     elif (
                         hasattr(chunk, "event")
                         and hasattr(chunk.event, "payload")
                         and hasattr(chunk.event.payload, "turn")
                     ):
-                        turn = chunk.event.payload.turn
-                        if hasattr(turn, "output_message") and hasattr(
-                            turn.output_message, "content"
-                        ):
-                            content = turn.output_message.content
-
-                    # Send content if we found any
-                    if content:
-                        json_data = {"type": "token", "content": content}
-                        yield f"data: {json.dumps(json_data)}\n\n"
+                        # Turn complete - streaming is done, don't resend the complete message
+                        logger.debug("Turn complete event received")
 
                     # Add a small async sleep to allow other coroutines to run
                     await asyncio.sleep(0.001)
@@ -354,20 +346,15 @@ def get_public_router():
         else:
             logger.debug("non streaming")
             try:
-                # Get the final response content
-                response_content = ""
-                for event in AgentEventLogger().log(output):
-                    if event is not None and hasattr(event, "content"):
-                        response_content += event.content
+                # For non-streaming, output is a Turn object from LlamaStack
+                response_content = None
+                if hasattr(output, "output_message") and hasattr(
+                    output.output_message, "content"
+                ):
+                    response_content = output.output_message.content
 
                 if not response_content:
-                    # Fallback to output_message if available
-                    if hasattr(output, "output_message") and hasattr(
-                        output.output_message, "content"
-                    ):
-                        response_content = output.output_message.content
-                    else:
-                        response_content = "No response generated."
+                    response_content = "No response generated from the model."
 
                 return {
                     "content": response_content,
