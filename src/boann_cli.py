@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from pathlib import Path
 from typing import Optional
 import httpx
@@ -47,14 +48,16 @@ class BoannClient:
         url = f"{self.base_url}/query"
         payload = {"query": query, "stream": stream}
 
+        start_time = time.time()
+
         async with httpx.AsyncClient(timeout=120.0, verify=self.verify_ssl) as client:
             if stream:
-                await self._handle_streaming_response(client, url, payload)
+                await self._handle_streaming_response(client, url, payload, start_time)
             else:
-                await self._handle_json_response(client, url, payload)
+                await self._handle_json_response(client, url, payload, start_time)
 
     async def _handle_streaming_response(
-        self, client: httpx.AsyncClient, url: str, payload: dict
+        self, client: httpx.AsyncClient, url: str, payload: dict, start_time: float
     ) -> None:
         """Handle Server-Sent Events streaming response"""
         try:
@@ -78,6 +81,8 @@ class BoannClient:
 
                         if data_content == "[DONE]":
                             print("\n✅ Stream completed")
+                            elapsed_time = time.time() - start_time
+                            print(f"⏱️  Processing time: {elapsed_time:.2f} seconds")
                             break
 
                         try:
@@ -104,7 +109,7 @@ class BoannClient:
             print(f"❌ Unexpected error: {e}", file=sys.stderr)
 
     async def _handle_json_response(
-        self, client: httpx.AsyncClient, url: str, payload: dict
+        self, client: httpx.AsyncClient, url: str, payload: dict, start_time: float
     ) -> None:
         """Handle non-streaming JSON response"""
         try:
@@ -122,6 +127,9 @@ class BoannClient:
             if self.show_source and "metadata" in data:
                 print("\nRAG Metadata:")
                 self._print_metadata(data["metadata"])
+
+            elapsed_time = time.time() - start_time
+            print(f"\n⏱️  Processing time: {elapsed_time:.2f} seconds")
 
         except httpx.RequestError as e:
             print(f"❌ Network error connecting to {url}: {e}", file=sys.stderr)
